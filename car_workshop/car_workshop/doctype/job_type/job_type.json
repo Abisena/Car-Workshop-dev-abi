@@ -9,6 +9,7 @@
     "job_name",
     "description",
     "default_price",
+    "time_minutes",
     "is_opl",
     "opl_vendor",
     "opl_item_code",
@@ -37,6 +38,12 @@
       "fieldtype": "Currency",
       "label": "Default Price",
       "in_list_view": 1
+    },
+    {
+      "fieldname": "time_minutes",
+      "fieldtype": "Float",
+      "label": "Time (Minutes)",
+      "default": "0"
     },
     {
       "default": "0",
