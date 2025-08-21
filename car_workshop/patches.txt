@@ -1,3 +1,4 @@
 # Patches file - disimpan di car_workshop/patches.txt
 car_workshop.patches.replace_null_purchase_order
 car_workshop.patches.add_billing_preference
+car_workshop.patches.add_time_minutes_to_job_type

@@ -27,10 +27,20 @@ class ServicePackage(Document):
         job_durations = {}
 
         if job_types:
+            job_fields = ["name", "default_price"]
+            has_column = getattr(getattr(frappe, "db", None), "has_column", None)
+            if callable(has_column):
+                if frappe.db.has_column("Job Type", "time_minutes"):
+                    job_fields.append("time_minutes")
+                else:
+                    job_fields.append("0 as time_minutes")
+            else:
+                job_fields.append("time_minutes")
+
             job_data = frappe.get_all(
                 "Job Type",
                 filters={"name": ["in", job_types]},
-                fields=["name", "default_price", "time_minutes"],
+                fields=job_fields,
             )
 
             missing_rate = []
