@@ -1,24 +1,31 @@
 frappe.ui.form.on('Job Type', {
     refresh: function(frm) {
-        // Add custom field for current price if not exists
+        // Add refresh button once
         if (!frm.custom_current_price_added) {
             frm.add_custom_button(__('Refresh Current Price'), function() {
                 fetch_active_service_price(frm);
             });
-            
-            // Create a custom field to show current price without modifying the doctype
-            frm.add_custom_field({
-                fieldname: 'current_price_display',
-                fieldtype: 'Currency',
-                label: 'Current Price (from Price List)',
-                read_only: 1,
-                fieldgroup: 'Default Price', // Add it near the default price field
-                insert_after: 'default_price',
-                bold: 1,
-                description: 'This price is fetched from the Service Price List and does not affect the default price'
-            });
-            
+
             frm.custom_current_price_added = true;
+        }
+
+        // Create a runtime field to show the current price if not already created
+        if (!frm.current_price_control) {
+            frm.current_price_control = frappe.ui.form.make_control({
+                df: {
+                    fieldname: 'current_price_display',
+                    fieldtype: 'Currency',
+                    label: 'Current Price (from Price List)',
+                    read_only: 1,
+                    bold: 1,
+                    description: 'This price is fetched from the Service Price List and does not affect the default price',
+                },
+                parent: frm.get_field('default_price').wrapper.parent(),
+                render_input: true,
+            });
+        } else {
+            // Ensure the control is refreshed on form refresh without re-creating
+            frm.current_price_control.refresh();
         }
         
         // Fetch active service price
@@ -51,7 +58,7 @@ function fetch_active_service_price(frm) {
             callback: function(r) {
                 if (r.message && r.message.rate) {
                     // Update the custom field with the active price
-                    frm.set_value('current_price_display', r.message.rate);
+                    frm.current_price_control && frm.current_price_control.set_value(r.message.rate);
                     
                     // Show a flash message with the price information
                     const rate = frappe.utils.escape_html(
@@ -63,7 +70,7 @@ function fetch_active_service_price(frm) {
                     }, 5);
                 } else {
                     // If no price found in Service Price List, show default price
-                    frm.set_value('current_price_display', frm.doc.default_price);
+                    frm.current_price_control && frm.current_price_control.set_value(frm.doc.default_price);
                     
                     if (frm.doc.default_price) {
                         const defaultPrice = frappe.utils.escape_html(
