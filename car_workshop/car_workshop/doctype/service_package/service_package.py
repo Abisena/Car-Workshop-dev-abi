@@ -1,7 +1,6 @@
 import frappe
 from frappe.model.document import Document
 from collections import defaultdict
-import json
 import hashlib
 
 class ServicePackage(Document):
@@ -150,8 +149,17 @@ class ServicePackage(Document):
             return False
 
         def serialize(details):
+            fields = (
+                "item_type",
+                "job_type",
+                "part",
+                "quantity",
+                "rate",
+                "amount",
+                "remarks",
+            )
             return [
-                d.as_dict() if hasattr(d, "as_dict") else getattr(d, "__dict__", {})
+                {f: getattr(d, f, None) for f in fields}
                 for d in details or []
             ]
 
@@ -159,10 +167,10 @@ class ServicePackage(Document):
         previous_details = serialize(previous_doc.get("details"))
 
         current_hash = hashlib.md5(
-            json.dumps(current_details, sort_keys=True).encode()
+            frappe.as_json(current_details, sort_keys=True).encode()
         ).hexdigest()
         previous_hash = hashlib.md5(
-            json.dumps(previous_details, sort_keys=True).encode()
+            frappe.as_json(previous_details, sort_keys=True).encode()
         ).hexdigest()
 
         return current_hash != previous_hash
