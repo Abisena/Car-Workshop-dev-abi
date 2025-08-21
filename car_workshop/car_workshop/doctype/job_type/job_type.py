@@ -6,18 +6,18 @@ class JobType(Document):
     def validate(self):
         self.validate_opl_logic()
         self.calculate_item_amounts()
-    
+
     def validate_opl_logic(self):
         """Validate OPL (Outsourced) job logic"""
         if self.is_opl:
             # Validations for OPL jobs
-            if not self.opl_supplier:
-                frappe.throw(_("OPL Supplier is required for outsourced jobs"))
-            if not self.opl_item:
-                frappe.throw(_("OPL Item is required for outsourced jobs"))
+            if not self.opl_vendor:
+                frappe.throw(_("OPL Vendor is required for outsourced jobs"))
+            if not self.opl_item_code:
+                frappe.throw(_("OPL Item Code is required for outsourced jobs"))
             if self.items and len(self.items) > 0:
-                frappe.throw(_("Job Type Items should not be added for OPL jobs - use only OPL Item"))
-            
+                frappe.throw(_("Job Type Items should not be added for OPL jobs - use only OPL Item Code"))
+
             # Set default price based on OPL item if not already set
             if not self.default_price:
                 opl_cost = self.get_opl_cost()
@@ -30,19 +30,19 @@ class JobType(Document):
     
     def get_opl_cost(self):
         """Get the cost from the linked OPL item"""
-        if not self.opl_item:
+        if not self.opl_item_code:
             return 0
             
         try:
             # Try to get standard_rate from the item
-            item_rate = frappe.db.get_value("Item", self.opl_item, "standard_rate")
+            item_rate = frappe.db.get_value("Item", self.opl_item_code, "standard_rate")
             
             # If standard_rate is not set, try to get price from Item Price
             if not item_rate:
                 item_prices = frappe.get_all(
                     "Item Price",
                     filters={
-                        "item_code": self.opl_item,
+                        "item_code": self.opl_item_code,
                         "selling": 1
                     },
                     fields=["price_list_rate"],
