@@ -183,16 +183,6 @@
   "index_web_pages_for_search": 1,
   "links": [
     {
-      "group": "Reference",
-      "link_doctype": "Customer",
-      "link_fieldname": "customer"
-    },
-    {
-      "group": "Reference",
-      "link_doctype": "Customer Vehicle",
-      "link_fieldname": "customer_vehicle"
-    },
-    {
       "group": "Transactions",
       "link_doctype": "Workshop Material Issue",
       "link_fieldname": "work_order"
