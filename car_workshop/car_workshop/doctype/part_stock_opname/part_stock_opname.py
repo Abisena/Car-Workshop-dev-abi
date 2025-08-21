@@ -271,6 +271,35 @@ def make_stock_adjustment(source_name, target_doc=None):
 
 
 def remind_pending_opnames():
-    """Kirim reminder untuk stock opname yang masih pending."""
-    # TODO: implementasi asli
-    frappe.logger().info("remind_pending_opnames: no-op (stub)")
+    """Send notifications for Part Stock Opnames that are still pending."""
+    pending_opnames = frappe.get_all(
+        "Part Stock Opname",
+        filters={"status": "Submitted", "docstatus": 1},
+        fields=["name", "owner"],
+    )
+
+    for opname in pending_opnames:
+        owner = opname.get("owner")
+        name = opname.get("name")
+
+        if not owner or not name:
+            continue
+
+        subject = _("Part Stock Opname {0} Pending").format(name)
+        message = _(
+            "Please review and adjust Part Stock Opname {0}."
+        ).format(name)
+
+        frappe.sendmail(recipients=[owner], subject=subject, message=message)
+
+        frappe.get_doc(
+            {
+                "doctype": "Notification Log",
+                "for_user": owner,
+                "type": "Alert",
+                "subject": subject,
+                "email_content": message,
+                "document_type": "Part Stock Opname",
+                "document_name": name,
+            }
+        ).insert(ignore_permissions=True)
