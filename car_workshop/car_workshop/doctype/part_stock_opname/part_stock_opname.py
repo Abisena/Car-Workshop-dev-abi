@@ -268,3 +268,9 @@ def make_stock_adjustment(source_name, target_doc=None):
     """
     opname = frappe.get_doc("Part Stock Opname", source_name)
     return opname.create_stock_adjustment()
+
+
+def remind_pending_opnames():
+    """Kirim reminder untuk stock opname yang masih pending."""
+    # TODO: implementasi asli
+    frappe.logger().info("remind_pending_opnames: no-op (stub)")
