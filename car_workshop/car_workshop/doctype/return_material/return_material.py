@@ -376,3 +376,10 @@ def get_returnable_items(work_order):
         })
     
     return returnable_items
+
+
+def process_pending_returns():
+    """Dipanggil oleh scheduler. Proses Return Material yang statusnya pending."""
+    # TODO: implementasi asli
+    # Contoh stub aman agar tidak error:
+    frappe.logger().info("process_pending_returns: no-op (stub)")
