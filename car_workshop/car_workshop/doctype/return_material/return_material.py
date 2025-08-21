@@ -379,7 +379,36 @@ def get_returnable_items(work_order):
 
 
 def process_pending_returns():
-    """Dipanggil oleh scheduler. Proses Return Material yang statusnya pending."""
-    # TODO: implementasi asli
-    # Contoh stub aman agar tidak error:
-    frappe.logger().info("process_pending_returns: no-op (stub)")
+    """Process Return Material documents that are pending.
+
+    This function is meant to be executed by a scheduler. It looks for
+    ``Return Material`` documents whose status is set to ``Pending`` and
+    automatically processes the material return by creating the stock entry and
+    updating the document's status. Any errors are logged so that one failing
+    document does not halt the whole job.
+    """
+
+    pending_returns = frappe.get_all(
+        "Return Material",
+        filters={"status": "Pending", "docstatus": 1},
+        fields=["name"],
+    )
+
+    if not pending_returns:
+        return
+
+    logger = frappe.logger()
+
+    for d in pending_returns:
+        name = d.get("name") if isinstance(d, dict) else d.name
+        try:
+            rm = frappe.get_doc("Return Material", name)
+            rm.make_stock_entry_for_return()
+            rm.set_status()
+            rm.save()
+            logger.info(f"process_pending_returns: processed {name}")
+        except Exception as e:  # pragma: no cover - defensive logging
+            frappe.log_error(
+                _("Error processing Return Material {0}: {1}").format(name, str(e)),
+                "Return Material Processing",
+            )
