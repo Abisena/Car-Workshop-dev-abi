@@ -2,6 +2,7 @@ import frappe
 from frappe.model.document import Document
 from collections import defaultdict
 import hashlib
+import json
 
 class ServicePackage(Document):
     def validate(self):
@@ -167,10 +168,10 @@ class ServicePackage(Document):
         previous_details = serialize(previous_doc.get("details"))
 
         current_hash = hashlib.md5(
-            frappe.as_json(current_details, sort_keys=True).encode()
+            json.dumps(current_details, sort_keys=True).encode()
         ).hexdigest()
         previous_hash = hashlib.md5(
-            frappe.as_json(previous_details, sort_keys=True).encode()
+            json.dumps(previous_details, sort_keys=True).encode()
         ).hexdigest()
 
         return current_hash != previous_hash
