@@ -12,9 +12,9 @@ class Document:
 
 # In-memory data for stubs
 job_types = {
-    "OPL Job": {"default_price": 150, "time_minutes": 0},
-    "Internal Job": {"default_price": None, "time_minutes": 0},
-    "Fallback Job": {"default_price": None, "time_minutes": 0},
+    "OPL Job": {"default_price": 150, "time_minutes": 30},
+    "Internal Job": {"default_price": None, "time_minutes": 45},
+    "Fallback Job": {"default_price": None, "time_minutes": 60},
 }
 
 job_type_items = {
@@ -113,6 +113,8 @@ def test_service_package_pricing_with_opl_and_internal_jobs():
     assert sp.price == 350
     assert sp.details[0].amount == 150
     assert sp.details[1].amount == 200
+    assert sp.total_time_minutes == 75
+    assert sp.estimated_time == "1 hr 15 mins"
 
 
 def test_get_job_type_rate_uses_service_price_list_when_missing():
@@ -128,4 +130,21 @@ def test_get_job_type_rate_uses_service_price_list_when_missing():
 
     sp = ServicePackage(price_list="Retail")
     assert sp.get_job_type_rate("Fallback Job") == 50
+
+
+def test_service_package_is_modified_flag_set_on_changes():
+    sys.modules["frappe"] = frappe_stub
+    sys.modules["frappe.utils"] = frappe_utils
+    sp = ServicePackage(
+        price_list="Retail",
+        details=[
+            types.SimpleNamespace(
+                item_type="Job", job_type="OPL Job", quantity=1, amount=0, rate=0
+            )
+        ],
+    )
+    sp.calculate_totals()
+    sp.has_value_changed = lambda field: True
+    sp.before_save()
+    assert sp.is_modified == 1
 

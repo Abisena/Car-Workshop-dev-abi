@@ -11,6 +11,9 @@
     "price",
     "currency",
     "description",
+    "total_time_minutes",
+    "estimated_time",
+    "is_modified",
     "is_active",
     "details_section",
     "details"
@@ -52,6 +55,25 @@
       "label": "Description"
     },
     {
+      "fieldname": "total_time_minutes",
+      "fieldtype": "Int",
+      "label": "Total Time (Minutes)",
+      "read_only": 1
+    },
+    {
+      "fieldname": "estimated_time",
+      "fieldtype": "Data",
+      "label": "Estimated Time",
+      "read_only": 1
+    },
+    {
+      "default": "0",
+      "fieldname": "is_modified",
+      "fieldtype": "Check",
+      "label": "Is Modified",
+      "read_only": 1
+    },
+    {
       "default": "1",
       "fieldname": "is_active",
       "fieldtype": "Check",
@@ -73,7 +95,7 @@
   ],
   "index_web_pages_for_search": 0,
   "links": [],
-  "modified": "2023-09-25 12:00:00.000000",
+  "modified": "2025-08-21 12:00:00.000000",
   "modified_by": "Administrator",
   "module": "Car Workshop",
   "name": "Service Package",
