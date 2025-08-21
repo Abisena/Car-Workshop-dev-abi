@@ -43,7 +43,12 @@ frappe.ui.form.on('Service Package Detail', {
                 callback: function(r) {
                     if (r.message && r.message.rate) {
                         // Set the rate from the service price list
-                        frappe.model.set_value(cdt, cdn, 'rate', r.message.rate);
+                        frappe.model
+                            .set_value(cdt, cdn, 'rate', r.message.rate)
+                            .then(() => {
+                                calculate_amount(cdt, cdn);
+                                calculate_total(frm);
+                            });
                     } else {
                         // Fallback: try to get default_price from Job Type
                         frappe.call({
@@ -55,9 +60,19 @@ frappe.ui.form.on('Service Package Detail', {
                             },
                             callback: function(r) {
                                 if (r.message && r.message.default_price) {
-                                    frappe.model.set_value(cdt, cdn, 'rate', r.message.default_price);
+                                    frappe.model
+                                        .set_value(cdt, cdn, 'rate', r.message.default_price)
+                                        .then(() => {
+                                            calculate_amount(cdt, cdn);
+                                            calculate_total(frm);
+                                        });
                                 } else {
-                                    frappe.model.set_value(cdt, cdn, 'rate', 0);
+                                    frappe.model
+                                        .set_value(cdt, cdn, 'rate', 0)
+                                        .then(() => {
+                                            calculate_amount(cdt, cdn);
+                                            calculate_total(frm);
+                                        });
                                 }
                             }
                         });
@@ -85,7 +100,12 @@ frappe.ui.form.on('Service Package Detail', {
                 callback: function(r) {
                     if (r.message && r.message.rate) {
                         // Set the rate from the service price list
-                        frappe.model.set_value(cdt, cdn, 'rate', r.message.rate);
+                        frappe.model
+                            .set_value(cdt, cdn, 'rate', r.message.rate)
+                            .then(() => {
+                                calculate_amount(cdt, cdn);
+                                calculate_total(frm);
+                            });
                     } else {
                         // Fallback: try to get current_price from Part
                         frappe.call({
@@ -97,9 +117,19 @@ frappe.ui.form.on('Service Package Detail', {
                             },
                             callback: function(r) {
                                 if (r.message && r.message.current_price) {
-                                    frappe.model.set_value(cdt, cdn, 'rate', r.message.current_price);
+                                    frappe.model
+                                        .set_value(cdt, cdn, 'rate', r.message.current_price)
+                                        .then(() => {
+                                            calculate_amount(cdt, cdn);
+                                            calculate_total(frm);
+                                        });
                                 } else {
-                                    frappe.model.set_value(cdt, cdn, 'rate', 0);
+                                    frappe.model
+                                        .set_value(cdt, cdn, 'rate', 0)
+                                        .then(() => {
+                                            calculate_amount(cdt, cdn);
+                                            calculate_total(frm);
+                                        });
                                 }
                             }
                         });
