@@ -275,16 +275,20 @@ function fetch_current_price(frm) {
         callback: function(r) {
             if (r.message && r.message.rate) {
                 // Set the current_price field with the price from Service Price List
-                frm.set_value('current_price', r.message.rate);
-                frm.refresh_field('current_price');
-                
+                const rate = r.message.rate;
+                if (frm.doc.current_price != rate) {
+                    frm.set_value('current_price', rate, undefined, {ignore_form_dirty: 1});
+                }
+
                 // Show indicator of where the price came from
                 frm.set_df_property('current_price', 'description',
                     `Price from Service Price List (${frappe.utils.escape_html(price_list)})`);
-                
+
+                frm.refresh_field('current_price');
+
                 // Show success message
                 const price = frappe.utils.escape_html(
-                    format_currency(r.message.rate, frappe.defaults.get_default('currency'))
+                    format_currency(rate, frappe.defaults.get_default('currency'))
                 );
                 frappe.show_alert({
                     message: __('Price updated from Service Price List: {0}', [
@@ -310,16 +314,19 @@ function fetch_current_price(frm) {
 function get_price_from_item_price(frm, price_list) {
     if (!frm.doc.item_code) {
         // No item code, can't get price from Item Price
-        frm.set_value('current_price', 0);
-        frm.refresh_field('current_price');
+        if (frm.doc.current_price != 0) {
+            frm.set_value('current_price', 0, undefined, {ignore_form_dirty: 1});
+        }
         frm.set_df_property('current_price', 'description', 'No price available');
-        
+
+        frm.refresh_field('current_price');
+
         // Show warning
         frappe.show_alert({
             message: __('No price found for this part'),
             indicator: 'orange'
         }, 3);
-        
+
         return;
     }
     
@@ -340,16 +347,20 @@ function get_price_from_item_price(frm, price_list) {
         callback: function(response) {
             if (response.message && response.message.length > 0) {
                 // Set the current_price field with the latest price from Item Price
-                frm.set_value('current_price', response.message[0].price_list_rate);
-                frm.refresh_field('current_price');
-                
+                const rate = response.message[0].price_list_rate;
+                if (frm.doc.current_price != rate) {
+                    frm.set_value('current_price', rate, undefined, {ignore_form_dirty: 1});
+                }
+
                 // Show indicator of where the price came from
                 frm.set_df_property('current_price', 'description',
                     `Price from Item Price (${frappe.utils.escape_html(price_list)})`);
-                
+
+                frm.refresh_field('current_price');
+
                 // Show info message
                 const price = frappe.utils.escape_html(
-                    format_currency(response.message[0].price_list_rate,
+                    format_currency(rate,
                         frappe.defaults.get_default('currency'))
                 );
                 frappe.show_alert({
@@ -360,10 +371,13 @@ function get_price_from_item_price(frm, price_list) {
                 }, 3);
             } else {
                 // No price found in Item Price either
-                frm.set_value('current_price', 0);
-                frm.refresh_field('current_price');
+                if (frm.doc.current_price != 0) {
+                    frm.set_value('current_price', 0, undefined, {ignore_form_dirty: 1});
+                }
                 frm.set_df_property('current_price', 'description', 'No price available');
-                
+
+                frm.refresh_field('current_price');
+
                 // Show warning
                 frappe.show_alert({
                     message: __('No price found for this part'),
@@ -373,12 +387,15 @@ function get_price_from_item_price(frm, price_list) {
         },
         error: function(err) {
             console.error("Error fetching price from Item Price:", err);
-            
+
             // Set defaults since we couldn't get a price
-            frm.set_value('current_price', 0);
-            frm.refresh_field('current_price');
+            if (frm.doc.current_price != 0) {
+                frm.set_value('current_price', 0, undefined, {ignore_form_dirty: 1});
+            }
             frm.set_df_property('current_price', 'description', 'Error fetching price');
-            
+
+            frm.refresh_field('current_price');
+
             frappe.show_alert({
                 message: __('Error fetching price information'),
                 indicator: 'red'
