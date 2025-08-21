@@ -118,15 +118,15 @@ frappe.ui.form.on('Job Type Item', {
         update_item_amount(frm, cdt, cdn);
     },
     
-    item: function(frm, cdt, cdn) {
+    item_code: function(frm, cdt, cdn) {
         // When item is selected, fetch its price
         var row = locals[cdt][cdn];
-        if (row.item) {
+        if (row.item_code) {
             frappe.call({
                 method: 'frappe.client.get_value',
                 args: {
                     doctype: 'Item',
-                    filters: { name: row.item },
+                    filters: { name: row.item_code },
                     fieldname: ['standard_rate']
                 },
                 callback: function(r) {
