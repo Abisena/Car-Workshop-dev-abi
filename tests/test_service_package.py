@@ -2,12 +2,16 @@ import sys
 import types
 from pathlib import Path
 import importlib
+import json
 
 
 class Document:
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def get(self, key):
+        return getattr(self, key, None)
 
 
 # In-memory data for stubs
@@ -79,6 +83,7 @@ frappe_stub = types.SimpleNamespace(
     throw=lambda *args, **kwargs: (_ for _ in ()).throw(Exception(args[0] if args else "")),
     _=lambda m: m,
     whitelist=lambda *args, **kwargs: (lambda f: f),
+    as_json=lambda obj, sort_keys=True: json.dumps(obj, sort_keys=sort_keys, default=str),
 )
 
 frappe_stub.model = types.SimpleNamespace(
@@ -147,4 +152,42 @@ def test_service_package_is_modified_flag_set_on_changes():
     sp.has_value_changed = lambda field: True
     sp.before_save()
     assert sp.is_modified == 1
+
+
+def test_details_have_changed_ignores_metadata_and_unserializable_fields():
+    sys.modules["frappe"] = frappe_stub
+    sys.modules["frappe.utils"] = frappe_utils
+
+    prev_detail = types.SimpleNamespace(
+        item_type="Job",
+        job_type="OPL Job",
+        part=None,
+        quantity=1,
+        rate=150,
+        amount=150,
+        remarks="note",
+        creation=object(),
+        modified=object(),
+    )
+
+    new_detail = types.SimpleNamespace(
+        item_type="Job",
+        job_type="OPL Job",
+        part=None,
+        quantity=1,
+        rate=150,
+        amount=150,
+        remarks="note",
+        creation=object(),
+        modified=object(),
+    )
+
+    previous_doc = ServicePackage(price_list="Retail", details=[prev_detail])
+    sp = ServicePackage(price_list="Retail", details=[new_detail])
+    sp.get_doc_before_save = lambda: previous_doc
+
+    assert not sp._details_have_changed()
+
+    sp.details[0].remarks = "changed"
+    assert sp._details_have_changed()
 
