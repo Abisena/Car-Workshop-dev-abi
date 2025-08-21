@@ -139,7 +139,54 @@ frappe.ui.form.on('Job Type Item', {
                 callback: function(r) {
                     if (r.message && r.message.standard_rate) {
                         frappe.model.set_value(cdt, cdn, 'rate', r.message.standard_rate);
+                        update_item_amount(frm, cdt, cdn);
                     }
+
+                    // Try to fetch price from active Service Price List
+                    frappe.call({
+                        method:
+                            'car_workshop.car_workshop.doctype.service_price_list.get_active_service_price.get_active_service_price',
+                        args: {
+                            reference_type: 'Part',
+                            reference_name: row.item_code,
+                            price_list: 'Retail Price List'
+                        },
+                        callback: function(price_res) {
+                            if (price_res.message && price_res.message.rate) {
+                                frappe.model.set_value(cdt, cdn, 'rate', price_res.message.rate);
+                                update_item_amount(frm, cdt, cdn);
+                            } else {
+                                // Fallback to Item Price doctype
+                                frappe.call({
+                                    method: 'frappe.client.get_list',
+                                    args: {
+                                        doctype: 'Item Price',
+                                        filters: {
+                                            item_code: row.item_code,
+                                            price_list: 'Retail Price List'
+                                        },
+                                        fields: ['price_list_rate'],
+                                        limit: 1
+                                    },
+                                    callback: function(price_list_res) {
+                                        if (
+                                            price_list_res.message &&
+                                            price_list_res.message.length > 0 &&
+                                            price_list_res.message[0].price_list_rate
+                                        ) {
+                                            frappe.model.set_value(
+                                                cdt,
+                                                cdn,
+                                                'rate',
+                                                price_list_res.message[0].price_list_rate
+                                            );
+                                            update_item_amount(frm, cdt, cdn);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             });
         }
