@@ -1,0 +1,41 @@
+[
+ {
+  "desk_access": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Role",
+  "home_page": null,
+  "is_custom": 0,
+  "modified": "2025-08-21 08:59:09.498541",
+  "name": "Technician",
+  "restrict_to_domain": null,
+  "role_name": "Technician",
+  "two_factor_auth": 0
+ },
+ {
+  "desk_access": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Role",
+  "home_page": null,
+  "is_custom": 0,
+  "modified": "2025-08-21 08:59:09.512351",
+  "name": "Workshop Manager",
+  "restrict_to_domain": null,
+  "role_name": "Workshop Manager",
+  "two_factor_auth": 0
+ },
+ {
+  "desk_access": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Role",
+  "home_page": null,
+  "is_custom": 0,
+  "modified": "2025-08-21 08:59:09.788322",
+  "name": "Car Workshop Manager",
+  "restrict_to_domain": null,
+  "role_name": "Car Workshop Manager",
+  "two_factor_auth": 0
+ }
+]

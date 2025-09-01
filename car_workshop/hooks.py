@@ -127,10 +127,10 @@ fixtures = [
         "doctype": "Workspace",
         "filters": [["name", "=", "Car Workshop"]]
     },
-    {
-        "doctype": "Print Format",
-        "filters": [["module", "=", "Car Workshop"]]
-    }
+    # {
+    #     "doctype": "Print Format",
+    #     "filters": [["module", "=", "Car Workshop"]]
+    # }
 ]
 
 # Master data setup
